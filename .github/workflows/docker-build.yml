@@ -1,0 +1,35 @@
+name: Build and Test MuchToDo
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+
+      - name: Verify Go version
+        run: go version
+
+      - name: Download dependencies
+        working-directory: Server/MuchToDo
+        run: go mod download
+
+      - name: Build Go binary
+        working-directory: Server/MuchToDo
+        run: go build -o muchtodo cmd/api/main.go
+
+      - name: Build Docker image
+        working-directory: Server/MuchToDo
+        run: docker build -t muchtodo:latest .
